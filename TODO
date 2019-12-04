@@ -1,2 +1,3 @@
 ☐ Image/pgm.cpp
     ☐ Passer par l'opérateur "<<"
+    ☐ Transformer la fonction d'import de l'image (vérifier à partir d'autres images!)

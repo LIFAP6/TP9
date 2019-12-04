@@ -6,6 +6,7 @@ using namespace std;
 #include <sys/stat.h>
 
 #include "pgm.h"
+#include "noeud.h"
 
 /**
  * Constructeur par import du fichier pgm
@@ -106,7 +107,8 @@ void PGMImage::loadImage(string filePath)
         {
             int value;
             ss >> value;
-            pgmArray.insert(std::end(pgmArray),value);
+            Noeud noeud = Noeud(0, 0, value);
+            pgmArray.insert(std::end(pgmArray), value);
         }
         cout << endl;
         cout << "Taille obtenue : " << pgmArray.size() << endl;

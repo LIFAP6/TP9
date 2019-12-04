@@ -15,6 +15,7 @@ using namespace std;
             Noeud(int i, int j, int valeur);
 
             //Destructeur
+            ~Noeud();
 
             void ajouterUnNoeud(Noeud nouveauNoeud);
             void supprimerUnNoeud(Noeud noeudASupprimer);
