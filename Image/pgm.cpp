@@ -26,7 +26,7 @@ PGMImage::PGMImage(){
     numCol = 0;
     numRow = 0;
     maxIntensity = 0;
-    pgmArray = std::vector<int>();
+    pgmArray = std::vector<Noeud>();
 }
 
 /**
@@ -46,7 +46,7 @@ PGMImage& PGMImage::operator=(const PGMImage &rawImage){
     numRow = rawImage.numRow;
     maxIntensity = rawImage.maxIntensity;
     int newPgmArray[numRow * numCol];
-    pgmArray = std::vector<int>();
+    pgmArray = std::vector<Noeud>();
     for (int i = 0; i < (numRow * numCol);i++){
         pgmArray[i] = rawImage.pgmArray[i];
     }
@@ -61,7 +61,7 @@ void PGMImage::displayImage(){
     cout << "Nombre de colonnes : "<< numCol << " et nombre de lignes :" << numRow << "." << endl;
     for (int i = 0; i < numRow ; i++){
         for(int j = 0 ; j<numCol ; j++){
-            cout << pgmArray[i * numCol + j] << " ";
+            cout << pgmArray[i * numCol + j].getValue() << " ";
         }
         cout << endl;
     }
@@ -85,31 +85,39 @@ void PGMImage::loadImage(string filePath)
     {
         stringstream ss;
         string inputLine = "";
-        pgmArray = std::vector<int>();
+        pgmArray = std::vector<Noeud>();
 
-        // First line : version
+        // Première ligne : version
         getline(infile, inputLine);
         if (inputLine.compare("P2") != 0)
             cerr << "Erreur de version" << endl;
         else
             cout << "Version : " << inputLine << endl;
 
-        // Second line : comment
+        // Seconde ligne : commentaire
         getline(infile, inputLine);
         cout << "Commentaire : " << inputLine << endl;
 
-        // Continue with a stringstream
+        // Continue avec une ligne discontinue en string
         ss << infile.rdbuf();
-        // Third line : size
+
+        // Troisième ligne : taille
         ss >> numCol >> numRow >> maxIntensity;
         cout << numCol << " colonnes et " << numRow << " lignes." << endl;
-        for (int i = 0; i < (numRow * numCol);i++)
+
+        //Ajout du noeud S
+        pgmArray.insert(std::end(pgmArray), Noeud(0, 0, 255, START));
+        //Ajout des noeuds à partir du fichier
+        for (int i = 0; i < (numRow * numCol); i++)
         {
             int value;
             ss >> value;
-            Noeud noeud = Noeud(0, 0, value);
-            pgmArray.insert(std::end(pgmArray), value);
+            Noeud noeud = Noeud(i%numCol, i/numRow, value,MIDDLE);
+            pgmArray.insert(std::end(pgmArray), noeud);
         }
+        //Ajout du noeud S
+        pgmArray.insert(std::end(pgmArray), Noeud(0, 0, 0, END));
+
         cout << endl;
         cout << "Taille obtenue : " << pgmArray.size() << endl;
         infile.close();
@@ -148,9 +156,9 @@ void PGMImage::saveTo(string filePath){
         for (int i = 0; i < numRow ; i++){
             for(int j = 0 ; j<numCol ; j++){
                 if(j == (numCol-1)){
-                    fileOutput << pgmArray[i * numCol + j] << endl;
+                    fileOutput << pgmArray[i * numCol + j].getValue() << endl;
                 }else{
-                    fileOutput << pgmArray[i * numCol + j] << " ";
+                    fileOutput << pgmArray[i * numCol + j].getValue() << " ";
                 }
             }
         }
@@ -168,7 +176,7 @@ void PGMImage::saveTo(string filePath){
 int PGMImage::getElementNord(int i, int j){
     if(i>0){
         cout << "Accès au noeud présent à l'indice x:" << i - 1 << " et y:" << j << "." << endl;
-        return pgmArray[(i - 1) * numCol + j];
+        return pgmArray[(i - 1) * numCol + j].getValue();
     }else{
         cerr << "Il n'existe pas d'éléments au nord du noeud choisi!" << endl;
         return -1;
@@ -185,7 +193,7 @@ int PGMImage::getElementNord(int i, int j){
 int PGMImage::getElementSud(int i, int j){
     if(i<numRow){
         cout << "Accès au noeud présent à l'indice x:" << i + 1 << " et y:" << j << "." << endl;
-        return pgmArray[(i + 1) * numCol + j];
+        return pgmArray[(i + 1) * numCol + j].getValue();
     }else{
         cerr << "Il n'existe pas d'éléments au nord du noeud choisi!" << endl;
         return -1;
@@ -202,7 +210,7 @@ int PGMImage::getElementSud(int i, int j){
 int PGMImage::getElementEst(int i, int j){
     if(j<numCol){
         cout << "Accès au noeud présent à l'indice x:" << i << " et y:" << j + 1 << "." << endl;
-        return pgmArray[i * numCol + (j+1)];
+        return pgmArray[i * numCol + (j+1)].getValue();
     }else{
         cerr << "Il n'existe pas d'éléments au nord du noeud choisi!" << endl;
         return -1;
@@ -219,7 +227,7 @@ int PGMImage::getElementEst(int i, int j){
 int PGMImage::getElementOuest(int i, int j){
     if(j>0){
         cout << "Accès au noeud présent à l'indice x:" << i << " et y:" << j - 1 << "." << endl;
-        return pgmArray[i * numCol + (j-1)];
+        return pgmArray[i * numCol + (j-1)].getValue();
     }else{
         cerr << "Il n'existe pas d'éléments au nord du noeud choisi!" << endl;
         return -1;
@@ -240,6 +248,6 @@ void PGMImage::updateNoeud(int i, int j, int newValue){
     }else if(newValue<0){
         cerr << "La nouvelle valeur est négative!" << endl;
     }else{
-        pgmArray[i * numRow + j] = newValue;
+        pgmArray[i * numRow + j].setValue(newValue);
     }
 }

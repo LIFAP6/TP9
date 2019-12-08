@@ -1,11 +1,12 @@
 #include <iostream>
 #include <vector>
+#include "noeud.h"
 using namespace std;
 #ifndef PGMIMAGE
 #define PGMIMAGE
     class PGMImage{
         private:
-            vector<int> pgmArray;
+            vector<Noeud> pgmArray;
             int numCol;
             int numRow;
             int maxIntensity;
