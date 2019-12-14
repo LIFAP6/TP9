@@ -1,12 +1,16 @@
 #include <vector>
 using namespace std;
-#ifndef NOEUD
-#define NOEUD
+    
+#ifndef NOEUDHEADER
+#define NOEUDHEADER
     #define START 0
     #define MIDDLE 1
     #define END 2
     #define ALPHA 125
     #define BRUIT 125
+    #define NOTEXPLORED 0
+    #define NOTFINISHEDEXPLORING 1
+    #define FINISHEDEXPLORING 2
     class Noeud{
         private:
             int i;
@@ -14,6 +18,7 @@ using namespace std;
             int valeur;
             int typeNode;
             vector<Noeud> adjascences;
+            int exploredStatus;
 
         public:
             //Constructeur
@@ -32,10 +37,16 @@ using namespace std;
             vector<Noeud> getListeAdjascence();
             int getValue();
             int getNodeType();
+            int isMarked();
 
             //Setter
             void setValue(int newValue);
             int getArcWeight(int i);
-            
+            void setMarkedStatus(bool newStatus);
+
+            //Autre
+            int getMaxWeight(Noeud otherNoeud);
+            vector<Noeud> getSuccesseurs();
+            vector<Noeud> getPredecesseurs();
     };
 #endif

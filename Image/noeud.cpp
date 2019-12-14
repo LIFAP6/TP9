@@ -25,16 +25,22 @@ Noeud::Noeud(int x, int y, int value,int typeNoeud){
     typeNode = typeNoeud;
 }
 
+/**
+ * Poids maximal entre deux noeuds
+ * @param otherNode [Noeud] l'autre noeud
+ * @return valeur max entre deux noeuds
+ */
+
 //Opération sur la liste d'adjascence
 void Noeud::ajouterUnNoeud(Noeud nouveauNoeud){
     adjascences.insert(end(adjascences), nouveauNoeud);
 }
 
 void Noeud::supprimerUnNoeud(Noeud noeudASupprimer){
-    if(find(adjascences.begin(), adjascences.end(), adjascences) != adjascences.end()){
-        adjascences.erase(remove(adjascences.begin(),adjascences.end(),noeudASupprimer),adjascences.end());
-    }else{
-        cerr << "L'élément est absent de la liste d'adjascence!" << endl;
+    for (unsigned int ind = 0; ind < adjascences.size();ind++){
+        if(noeudASupprimer.i == adjascences[ind].i && noeudASupprimer.j == adjascences[ind].j){
+            adjascences.erase(adjascences.begin() + ind);
+        }
     }
 }
 
@@ -62,23 +68,25 @@ void Noeud::setValue(int newValue){
 
 int Noeud::getArcWeight(int i){
     int nodeType = getElement(i).getNodeType();
-    if(nodeType == START){
-        int value = -1 * exp((255 - getElement(i).getValue()) / (255));
+    int value;
+    if (nodeType == START)
+    {
+        value = -1 * exp((255 - getElement(i).getValue()) / (255));
         return value;
     }else if(nodeType == END){
-        int value = -1 * log((getElement(i).getValue()) / (255));
+        value = -1 * log((getElement(i).getValue()) / (255));
         return value;
     }else{
     switch (nodeType)
     {
         case START:
-            int value = -1 * exp((255 - value) / (255));
+            value = -1 * exp((255 - value) / (255));
             return value;
         case MIDDLE:
-            int value = exp(-1*(pow(value-getElement(i).getValue(),2)/(pow(BRUIT,2))));
+            value = exp(-1*(pow(value-getElement(i).getValue(),2)/(pow(BRUIT,2))));
             return value;
         case END:
-            int value = -1 * log((value) / (255));
+            value = -1 * log((value) / (255));
             return value;
         
         default:
@@ -87,4 +95,16 @@ int Noeud::getArcWeight(int i){
             break;
         }
     }
+}
+
+int Noeud::getNodeType(){
+    return typeNode;
+}
+
+Noeud::~Noeud(){
+    cout << "Suppression du noeud" << endl;
+}
+           
+int Noeud::getMaxWeight(Noeud noeud){
+    return (noeud.getValue() - valeur);
 }

@@ -12,6 +12,10 @@ using namespace std;
             int maxIntensity;
             int imageBruit;
 
+            //Ford-Fulkerson
+            vector<Noeud> rechercheChaineAmeliorante(vector<Noeud> pgmImage);
+            int calculFlotResiduel(vector<Noeud> chaineAméliorante);
+
         public:
             //Constructeur
             PGMImage();
@@ -39,5 +43,8 @@ using namespace std;
 
             //Affichage
             void displayImage();
+
+            //Algorithme Ford-Fulkerson
+            vector<Noeud> fordFulkerson();
     };
 #endif

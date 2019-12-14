@@ -251,3 +251,96 @@ void PGMImage::updateNoeud(int i, int j, int newValue){
         pgmArray[i * numRow + j].setValue(newValue);
     }
 }
+
+/**
+ * Fonction de recherche de chaine améliorante
+ * @return vector<Noeud> chaine améliorante si le puit est marqué
+ * @return vector<Noeud> vector vide si la chaine est vide
+ */
+vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> pgmImage){
+    vector<Noeud> file = vector<Noeud>();
+    vector<Noeud> chaineAmeliorante = vector<Noeud>();
+
+    //La source est "marquée"
+    pgmImage.insert(std::end(pgmImage), pgmImage[0]);
+    pgmImage.at(1).setMarkedStatus(true);
+    
+    //Tant que la file est vide et le puit n'est pas marqué
+    do
+    {
+        //On considère x comme le premier élément de la file
+        Noeud x = Noeud();
+        //On enlève le premier élément de la pile
+        pgmImage.erase(pgmImage.begin());
+
+        //On regarde ses successeurs
+        vector<Noeud>successeurs = x.getSuccesseurs();
+        for(Noeud successeur:successeurs){
+            //Si le successeur n'est pas marqué et son flot est inférieur à sa capacité maximum
+            if(successeur.isMarked()!=true && true){
+                //On ajoute le successeur à la file
+                pgmImage.insert(std::end(pgmImage), successeur);
+            }
+        }
+
+        //On regarde ses prédecesseurs
+        vector<Noeud> predecesseurs = x.getPredecesseurs();
+        for(Noeud predecesseur:predecesseurs){
+            //Si le prédecesseur n'est pas marqué et son flot est strictement positif
+            if(predecesseur.isMarked()!=true && true){
+                //On ajoute le prédecesseur à la file
+                pgmImage.insert(std::end(pgmImage), predecesseur);
+            }
+        }
+    } while (file != vector<Noeud>() && pgmArray.back().isMarked != true);
+
+    //Si le puit est marqué
+    if(pgmImage.back().isMarked()){
+        //Chaine améliorante
+        return chaineAmeliorante;
+    }else{
+        //Pas de chaîne améliorante
+        cout << "Aucune chaine améliorante ici!" << endl;
+        return vector<Noeud>();
+    }
+}
+
+/**
+ * Algorithme de Ford-Fulkerson
+ */
+vector<Noeud> PGMImage::fordFulkerson(){
+    vector<Noeud> newPGMImage = pgmArray;
+    vector<Noeud> chaineAmeliorante = rechercheChaineAmeliorante(newPGMImage);
+    do
+    {
+        //Calcul de la capacité résiduelle dans la chaîne améliorante
+        int flotResiduel = calculFlotResiduel(chaineAmeliorante);
+
+        //Recherche d'une chaîne améliorante
+        chaineAmeliorante = rechercheChaineAmeliorante(newPGMImage);
+
+        //On augmente ici
+
+        //On diminue ici
+    } while (chaineAmeliorante != vector<Noeud>());
+
+    //On retourne l'image modifiée
+    return newPGMImage;
+}
+
+/**Passer par des arcs avec deux paramètres
+ * mu+ -> arc i->j
+ * mu- -> arc j->i
+ * retourner valeur minimale
+ * 
+ */
+int PGMImage::calculFlotResiduel(vector<Noeud>chaineAmeliorante){
+    int flotResiduel = INTMAX_MAX;
+    for(vector<Noeud>::size_type i=0;i<chaineAmeliorante.size();i++){
+        int newFlotResiduel = -1/*Capacité - flot de l'arc*/;
+        if(newFlotResiduel<flotResiduel){
+            flotResiduel = newFlotResiduel;
+        }
+    }
+    return flotResiduel;
+}
