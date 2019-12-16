@@ -7,6 +7,7 @@ using namespace std;
 
 #include "pgm.h"
 #include "noeud.h"
+#include "arc.h"
 
 /**
  * Constructeur par import du fichier pgm
@@ -257,7 +258,7 @@ void PGMImage::updateNoeud(int i, int j, int newValue){
  * @return vector<Noeud> chaine améliorante si le puit est marqué
  * @return vector<Noeud> vector vide si la chaine est vide
  */
-vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> pgmImage){
+vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vector<Arc> &listePredecesseur, vector<Arc> &listeSuccesseur){
     vector<Noeud> file = vector<Noeud>();
     vector<Noeud> chaineAmeliorante = vector<Noeud>();
 
@@ -292,7 +293,7 @@ vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> pgmImage){
                 pgmImage.insert(std::end(pgmImage), predecesseur);
             }
         }
-    } while (file != vector<Noeud>() && pgmArray.back().isMarked != true);
+    } while (file != vector<Noeud>() && pgmArray.back().isMarked() != true);
 
     //Si le puit est marqué
     if(pgmImage.back().isMarked()){
@@ -310,18 +311,26 @@ vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> pgmImage){
  */
 vector<Noeud> PGMImage::fordFulkerson(){
     vector<Noeud> newPGMImage = pgmArray;
-    vector<Noeud> chaineAmeliorante = rechercheChaineAmeliorante(newPGMImage);
+    vector<Arc> listeSuccesseur = vector<Arc>();
+    vector<Arc> listePredecesseur = vector<Arc>();
+    vector<Noeud> chaineAmeliorante = rechercheChaineAmeliorante(newPGMImage,listePredecesseur,listeSuccesseur);
     do
     {
         //Calcul de la capacité résiduelle dans la chaîne améliorante
         int flotResiduel = calculFlotResiduel(chaineAmeliorante);
 
         //Recherche d'une chaîne améliorante
-        chaineAmeliorante = rechercheChaineAmeliorante(newPGMImage);
+        chaineAmeliorante = rechercheChaineAmeliorante(newPGMImage,listePredecesseur,listeSuccesseur);
 
         //On augmente ici
+        for (int i = 0; i < listeSuccesseur.size();i++){
+            listeSuccesseur[i].incrementFlowValue(flotResiduel);
+        }
 
         //On diminue ici
+        for (int i = 0; i < listePredecesseur.size(); i++){
+            listePredecesseur[i].decrementFlowCapacity(flotResiduel);
+        }
     } while (chaineAmeliorante != vector<Noeud>());
 
     //On retourne l'image modifiée
@@ -334,7 +343,7 @@ vector<Noeud> PGMImage::fordFulkerson(){
  * retourner valeur minimale
  * 
  */
-int PGMImage::calculFlotResiduel(vector<Noeud>chaineAmeliorante){
+int PGMImage::calculFlotResiduel(vector<Noeud> &chaineAmeliorante){
     int flotResiduel = INTMAX_MAX;
     for(vector<Noeud>::size_type i=0;i<chaineAmeliorante.size();i++){
         int newFlotResiduel = -1/*Capacité - flot de l'arc*/;

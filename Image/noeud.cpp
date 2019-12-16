@@ -108,3 +108,23 @@ Noeud::~Noeud(){
 int Noeud::getMaxWeight(Noeud noeud){
     return (noeud.getValue() - valeur);
 }
+
+bool Noeud::operator==(const Noeud first){
+    return true;
+}
+
+void Noeud::setMarkedStatus(bool newMarkedStatus){
+    exploredStatus = newMarkedStatus;
+}
+
+vector<Noeud> Noeud::getSuccesseurs(){
+    return adjascences;
+}
+
+bool Noeud::isMarked(){
+    return exploredStatus;
+}
+
+vector<Noeud> Noeud::getPredecesseurs(){
+    return vector<Noeud>();
+}

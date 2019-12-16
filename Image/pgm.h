@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include "noeud.h"
+#include "arc.h"
 using namespace std;
 #ifndef PGMIMAGE
 #define PGMIMAGE
@@ -13,8 +14,8 @@ using namespace std;
             int imageBruit;
 
             //Ford-Fulkerson
-            vector<Noeud> rechercheChaineAmeliorante(vector<Noeud> pgmImage);
-            int calculFlotResiduel(vector<Noeud> chaineAméliorante);
+            vector<Noeud> rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vector<Arc> &listePredecesseur, vector<Arc> &listeSuccesseur);
+            int calculFlotResiduel(vector<Noeud> &chaineAmeliorante);
 
         public:
             //Constructeur

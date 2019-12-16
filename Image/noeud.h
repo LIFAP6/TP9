@@ -18,7 +18,7 @@ using namespace std;
             int valeur;
             int typeNode;
             vector<Noeud> adjascences;
-            int exploredStatus;
+            bool exploredStatus;
 
         public:
             //Constructeur
@@ -37,7 +37,7 @@ using namespace std;
             vector<Noeud> getListeAdjascence();
             int getValue();
             int getNodeType();
-            int isMarked();
+            bool isMarked();
 
             //Setter
             void setValue(int newValue);
@@ -48,5 +48,8 @@ using namespace std;
             int getMaxWeight(Noeud otherNoeud);
             vector<Noeud> getSuccesseurs();
             vector<Noeud> getPredecesseurs();
+
+            //operator==
+            bool operator==(const Noeud first);
     };
 #endif
