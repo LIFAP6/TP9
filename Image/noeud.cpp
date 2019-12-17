@@ -66,15 +66,15 @@ void Noeud::setValue(int newValue){
     valeur = newValue;
 }
 
-int Noeud::getArcWeight(int i){
-    int nodeType = getElement(i).getNodeType();
+int Noeud::getArcWeight(Noeud otherNode){
+    int nodeType = otherNode.getNodeType();
     int value;
     if (nodeType == START)
     {
-        value = -1 * exp((255 - getElement(i).getValue()) / (255));
+        value = -1 * exp((255 - otherNode.getValue()) / (255));
         return value;
     }else if(nodeType == END){
-        value = -1 * log((getElement(i).getValue()) / (255));
+        value = -1 * log((otherNode.getValue()) / (255));
         return value;
     }else{
     switch (nodeType)
@@ -83,7 +83,7 @@ int Noeud::getArcWeight(int i){
             value = -1 * exp((255 - value) / (255));
             return value;
         case MIDDLE:
-            value = exp(-1*(pow(value-getElement(i).getValue(),2)/(pow(BRUIT,2))));
+            value = exp(-1*(pow(value-otherNode.getValue(),2)/(pow(BRUIT,2))));
             return value;
         case END:
             value = -1 * log((value) / (255));
@@ -126,5 +126,6 @@ bool Noeud::isMarked(){
 }
 
 vector<Noeud> Noeud::getPredecesseurs(){
+    vector<Noeud> predecesseurs = vector<Noeud>();
     return vector<Noeud>();
 }

@@ -15,7 +15,9 @@
         void incrementFlowValue(int newFlow);
         void decrementFlowCapacity(int newFlow);
         bool fullFlow();
-        
+
+        int getFlowValue();
+        int getFlowCapacity();
     };
 
 #endif

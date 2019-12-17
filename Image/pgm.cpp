@@ -46,7 +46,6 @@ PGMImage& PGMImage::operator=(const PGMImage &rawImage){
     numCol = rawImage.numCol;
     numRow = rawImage.numRow;
     maxIntensity = rawImage.maxIntensity;
-    int newPgmArray[numRow * numCol];
     pgmArray = std::vector<Noeud>();
     for (int i = 0; i < (numRow * numCol);i++){
         pgmArray[i] = rawImage.pgmArray[i];
@@ -280,6 +279,7 @@ vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vect
             //Si le successeur n'est pas marqué et son flot est inférieur à sa capacité maximum
             if(successeur.isMarked()!=true && true){
                 //On ajoute le successeur à la file
+                successeur.setMarkedStatus(true);
                 pgmImage.insert(std::end(pgmImage), successeur);
             }
         }
@@ -290,10 +290,11 @@ vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vect
             //Si le prédecesseur n'est pas marqué et son flot est strictement positif
             if(predecesseur.isMarked()!=true && true){
                 //On ajoute le prédecesseur à la file
+                predecesseur.setMarkedStatus(true);
                 pgmImage.insert(std::end(pgmImage), predecesseur);
             }
         }
-    } while (file != vector<Noeud>() && pgmArray.back().isMarked() != true);
+    } while (!file.empty() && pgmArray.back().isMarked() != true);
 
     //Si le puit est marqué
     if(pgmImage.back().isMarked()){
@@ -323,32 +324,33 @@ vector<Noeud> PGMImage::fordFulkerson(){
         chaineAmeliorante = rechercheChaineAmeliorante(newPGMImage,listePredecesseur,listeSuccesseur);
 
         //On augmente ici
-        for (int i = 0; i < listeSuccesseur.size();i++){
+        for (unsigned int i = 0; i < listeSuccesseur.size();i++){
             listeSuccesseur[i].incrementFlowValue(flotResiduel);
         }
 
         //On diminue ici
-        for (int i = 0; i < listePredecesseur.size(); i++){
+        for (unsigned int i = 0; i < listePredecesseur.size(); i++){
             listePredecesseur[i].decrementFlowCapacity(flotResiduel);
         }
-    } while (chaineAmeliorante != vector<Noeud>());
+    } while (!chaineAmeliorante.empty());
 
     //On retourne l'image modifiée
     return newPGMImage;
 }
 
-/**Passer par des arcs avec deux paramètres
+/**
+ * Passer par des arcs avec deux paramètres
  * mu+ -> arc i->j
  * mu- -> arc j->i
- * retourner valeur minimale
- * 
+ * @return valeur minimale
  */
 int PGMImage::calculFlotResiduel(vector<Noeud> &chaineAmeliorante){
-    int flotResiduel = INTMAX_MAX;
-    for(vector<Noeud>::size_type i=0;i<chaineAmeliorante.size();i++){
-        int newFlotResiduel = -1/*Capacité - flot de l'arc*/;
-        if(newFlotResiduel<flotResiduel){
-            flotResiduel = newFlotResiduel;
+    int flotResiduel = 1024;
+    for(vector<Noeud>::size_type i=0;i<chaineAmeliorante.size()-1;i++){
+        int newCapacity = chaineAmeliorante[i].getArcWeight(chaineAmeliorante[i+1]);
+        if (newCapacity < flotResiduel)
+        {
+            flotResiduel = newCapacity;
         }
     }
     return flotResiduel;

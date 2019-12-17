@@ -41,13 +41,14 @@ using namespace std;
 
             //Setter
             void setValue(int newValue);
-            int getArcWeight(int i);
+            int getArcWeight(Noeud otherNode);
             void setMarkedStatus(bool newStatus);
 
             //Autre
             int getMaxWeight(Noeud otherNoeud);
             vector<Noeud> getSuccesseurs();
             vector<Noeud> getPredecesseurs();
+            int getFlowCapacity(Noeud adjascence);
 
             //operator==
             bool operator==(const Noeud first);
