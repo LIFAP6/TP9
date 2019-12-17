@@ -38,6 +38,8 @@ using namespace std;
             int getValue();
             int getNodeType();
             bool isMarked();
+            int getX();
+            int getY();
 
             //Setter
             void setValue(int newValue);

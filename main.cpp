@@ -7,10 +7,24 @@ using namespace std;
 #include "Image/pgm.h"
 
 int main(){
+    //Chargement de l'image
     PGMImage image = PGMImage("File/file.pgm");
+    //Affichage de l'image
     image.displayImage();
+
+    //Modification du noeud
     image.updateNoeud(0, 0, 3);
+
+    //Affichage de l'image
     image.displayImage();
-    image.saveTo("File/newImage.pgm");
+
+    //Application de l'algorithme Ford Fulkerson
+    image.fordFulkerson();
+
+    //Affichage de l'image modifiée
+    image.displayImage();
+
+    //Sauvegarde de l'image
+    image.saveTo("File/modified_image.pgm");
     return 0;
 }

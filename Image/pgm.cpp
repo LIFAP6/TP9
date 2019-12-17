@@ -115,12 +115,32 @@ void PGMImage::loadImage(string filePath)
             Noeud noeud = Noeud(i%numCol, i/numRow, value,MIDDLE);
             pgmArray.insert(std::end(pgmArray), noeud);
         }
-        //Ajout du noeud S
+        //Ajout du noeud P
         pgmArray.insert(std::end(pgmArray), Noeud(0, 0, 0, END));
 
         cout << endl;
         cout << "Taille obtenue : " << pgmArray.size() << endl;
         infile.close();
+        ajoutAdjascence();
+    }
+}
+
+void PGMImage::ajoutAdjascence(){
+    for (int i = 0; i < pgmArray.size();i++){
+        switch(pgmArray[i].getNodeType()){
+            case START:{
+                //On ajoute uniquement l'ensemble des pixels de l'image dans les adjascences
+                for (int j = 1; j < pgmArray.size() - 1;j++){
+                    pgmArray[i].ajouterUnNoeud(pgmArray[j]);
+                }
+            }
+            case MIDDLE:{
+                pgmArray[i].ajouterUnNoeud(pgmArray[getElementNord(pgmArray[i].getX(), pgmArray[i].getY())]);
+                pgmArray[i].ajouterUnNoeud(pgmArray[getElementEst(pgmArray[i].getX(), pgmArray[i].getY())]);
+                pgmArray[i].ajouterUnNoeud(pgmArray[getElementOuest(pgmArray[i].getX(), pgmArray[i].getY())]);
+                pgmArray[i].ajouterUnNoeud(pgmArray[getElementSud(pgmArray[i].getX(), pgmArray[i].getY())]);
+            }
+        }
     }
 }
 
@@ -277,7 +297,7 @@ vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vect
         vector<Noeud>successeurs = x.getSuccesseurs();
         for(Noeud successeur:successeurs){
             //Si le successeur n'est pas marqué et son flot est inférieur à sa capacité maximum
-            if(successeur.isMarked()!=true && true){
+            if(successeur.isMarked()!=true && x.getArcWeight(successeur)<x.getMaxWeight(successeur)){
                 //On ajoute le successeur à la file
                 successeur.setMarkedStatus(true);
                 pgmImage.insert(std::end(pgmImage), successeur);
@@ -288,7 +308,7 @@ vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vect
         vector<Noeud> predecesseurs = x.getPredecesseurs();
         for(Noeud predecesseur:predecesseurs){
             //Si le prédecesseur n'est pas marqué et son flot est strictement positif
-            if(predecesseur.isMarked()!=true && true){
+            if(predecesseur.isMarked()!=true && predecesseur.getArcWeight(x)>0){
                 //On ajoute le prédecesseur à la file
                 predecesseur.setMarkedStatus(true);
                 pgmImage.insert(std::end(pgmImage), predecesseur);
@@ -333,8 +353,26 @@ vector<Noeud> PGMImage::fordFulkerson(){
             listePredecesseur[i].decrementFlowCapacity(flotResiduel);
         }
     } while (!chaineAmeliorante.empty());
+    //Réinitialisation du marquage
+    for (int i = 0; i < newPGMImage.size();i++){
+        newPGMImage[i].setMarkedStatus(false);
+    }
 
-    //On retourne l'image modifiée
+    //On réalise la binarisation de l'image en ignorant S et T
+    for (int i = 1; i < newPGMImage.size() - 1;i++){
+        binarisation(newPGMImage, newPGMImage[i], newPGMImage[0]);
+        newPGMImage[0].setMarkedStatus(false);
+        //On réinitialise le marquage du noeud en cours
+        newPGMImage[i].setMarkedStatus(false);
+        //On n'est pas arrivé à la source
+        if(newPGMImage[i].getValue() == 128){
+            binarisation(newPGMImage, newPGMImage[i], newPGMImage[1]);
+            newPGMImage[1].setMarkedStatus(false);
+            newPGMImage[i].setMarkedStatus(false);
+        }
+    }
+
+    //On retourne l'image binarisée
     return newPGMImage;
 }
 
@@ -346,12 +384,41 @@ vector<Noeud> PGMImage::fordFulkerson(){
  */
 int PGMImage::calculFlotResiduel(vector<Noeud> &chaineAmeliorante){
     int flotResiduel = 1024;
-    for(vector<Noeud>::size_type i=0;i<chaineAmeliorante.size()-1;i++){
+    int node = 0;
+    for (vector<Noeud>::size_type i = 0; i < chaineAmeliorante.size() - 1; i++)
+    {
         int newCapacity = chaineAmeliorante[i].getArcWeight(chaineAmeliorante[i+1]);
         if (newCapacity < flotResiduel)
         {
+            node = i;
             flotResiduel = newCapacity;
         }
     }
     return flotResiduel;
+}
+
+void PGMImage::binarisation(vector<Noeud> pgmImage, Noeud& noeudActuel, Noeud& direction){
+    noeudActuel.setMarkedStatus(true);
+    for (int i = 0; i < noeudActuel.getListeAdjascence().size();i++){
+        if(noeudActuel.getMaxWeight(noeudActuel.getListeAdjascence()[i]) == noeudActuel.getArcWeight(noeudActuel.getListeAdjascence()[i])){
+            binarisation(pgmImage, noeudActuel.getListeAdjascence()[i], direction);
+        }
+    }
+    //Arrivée à destination
+    if(direction.isMarked() == true){
+        switch(direction.getNodeType()){
+            case START:{
+                noeudActuel.setValue(255);
+                break;
+            }
+            case END:{
+                noeudActuel.setValue(0);
+                break;
+            }
+        }
+    }
+    //Problème
+    else{
+        noeudActuel.setValue(128);
+    }
 }

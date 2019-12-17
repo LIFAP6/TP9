@@ -129,3 +129,15 @@ vector<Noeud> Noeud::getPredecesseurs(){
     vector<Noeud> predecesseurs = vector<Noeud>();
     return vector<Noeud>();
 }
+
+int Noeud::getX(){
+    return i;
+}
+
+int Noeud::getY(){
+    return j;
+}
+
+vector<Noeud> Noeud::getListeAdjascence(){
+    return adjascences;
+}

@@ -41,6 +41,8 @@ using namespace std;
 
             //Modification de l'intensité d'un noeud
             void updateNoeud(int i, int j, int value);
+            void binarisation(vector<Noeud> pgmImage, Noeud &noeudActuel, Noeud& direction);
+            void ajoutAdjascence();
 
             //Affichage
             void displayImage();
