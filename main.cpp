@@ -12,9 +12,6 @@ int main(){
     //Affichage de l'image
     image.displayImage();
 
-    //Modification du noeud
-    image.updateNoeud(0, 0, 3);
-
     //Affichage de l'image
     image.displayImage();
 

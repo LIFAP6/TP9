@@ -126,19 +126,32 @@ void PGMImage::loadImage(string filePath)
 }
 
 void PGMImage::ajoutAdjascence(){
-    for (int i = 0; i < pgmArray.size();i++){
+    for (unsigned int i = 0; i < pgmArray.size();i++){
         switch(pgmArray[i].getNodeType()){
             case START:{
                 //On ajoute uniquement l'ensemble des pixels de l'image dans les adjascences
-                for (int j = 1; j < pgmArray.size() - 1;j++){
-                    pgmArray[i].ajouterUnNoeud(pgmArray[j]);
+                for (unsigned int j = 1; j < pgmArray.size() - 1;j++){
+                    pgmArray[i].ajouterUnNoeud(&pgmArray[j]);
                 }
             }
             case MIDDLE:{
-                pgmArray[i].ajouterUnNoeud(pgmArray[getElementNord(pgmArray[i].getX(), pgmArray[i].getY())]);
-                pgmArray[i].ajouterUnNoeud(pgmArray[getElementEst(pgmArray[i].getX(), pgmArray[i].getY())]);
-                pgmArray[i].ajouterUnNoeud(pgmArray[getElementOuest(pgmArray[i].getX(), pgmArray[i].getY())]);
-                pgmArray[i].ajouterUnNoeud(pgmArray[getElementSud(pgmArray[i].getX(), pgmArray[i].getY())]);
+                int indiceNord = getElementNord(pgmArray[i].getX(), pgmArray[i].getY());
+                int indiceSud = getElementSud(pgmArray[i].getX(), pgmArray[i].getY());
+                int indiceOuest = getElementEst(pgmArray[i].getX(), pgmArray[i].getY());
+                int indiceEst = getElementOuest(pgmArray[i].getX(), pgmArray[i].getY());
+                if(indiceNord!=-1){
+                    pgmArray[i].ajouterUnNoeud(&pgmArray[getElementNord(pgmArray[i].getX(), pgmArray[i].getY())]);
+                }
+                if(indiceOuest!=-1){
+                    pgmArray[i].ajouterUnNoeud(&pgmArray[getElementOuest(pgmArray[i].getX(), pgmArray[i].getY())]);
+                }
+                if(indiceEst!=-1){;
+                    pgmArray[i].ajouterUnNoeud(&pgmArray[getElementEst(pgmArray[i].getX(), pgmArray[i].getY())]);
+                }
+                if(indiceSud!=-1){
+                    pgmArray[i].ajouterUnNoeud(&pgmArray[getElementSud(pgmArray[i].getX(), pgmArray[i].getY())]);
+                }
+                pgmArray[i].ajouterUnNoeud(&pgmArray.back());
             }
         }
     }
@@ -198,7 +211,7 @@ int PGMImage::getElementNord(int i, int j){
         cout << "Accès au noeud présent à l'indice x:" << i - 1 << " et y:" << j << "." << endl;
         return pgmArray[(i - 1) * numCol + j].getValue();
     }else{
-        cerr << "Il n'existe pas d'éléments au nord du noeud choisi!" << endl;
+        cerr << "Il n'existe pas d'éléments au nord du noeud choisi avec x = "<< i << "et y = " << j <<" !" << endl;
         return -1;
     }
 }
@@ -215,7 +228,7 @@ int PGMImage::getElementSud(int i, int j){
         cout << "Accès au noeud présent à l'indice x:" << i + 1 << " et y:" << j << "." << endl;
         return pgmArray[(i + 1) * numCol + j].getValue();
     }else{
-        cerr << "Il n'existe pas d'éléments au nord du noeud choisi!" << endl;
+        cerr << "Il n'existe pas d'éléments au sud du noeud choisi avec x = "<< i << "et y = " << j <<" !" << endl;
         return -1;
     }
 }
@@ -232,7 +245,7 @@ int PGMImage::getElementEst(int i, int j){
         cout << "Accès au noeud présent à l'indice x:" << i << " et y:" << j + 1 << "." << endl;
         return pgmArray[i * numCol + (j+1)].getValue();
     }else{
-        cerr << "Il n'existe pas d'éléments au nord du noeud choisi!" << endl;
+        cerr << "Il n'existe pas d'éléments à l'est du noeud choisi avec x = "<< i << " et y = " << j <<" !" << endl;
         return -1;
     }    
 }
@@ -249,7 +262,7 @@ int PGMImage::getElementOuest(int i, int j){
         cout << "Accès au noeud présent à l'indice x:" << i << " et y:" << j - 1 << "." << endl;
         return pgmArray[i * numCol + (j-1)].getValue();
     }else{
-        cerr << "Il n'existe pas d'éléments au nord du noeud choisi!" << endl;
+        cerr << "Il n'existe pas d'éléments à l'ouest du noeud choisi avec x = "<< i << " et y = " << j <<" !" << endl;
         return -1;
     }    
 }
@@ -278,6 +291,7 @@ void PGMImage::updateNoeud(int i, int j, int newValue){
  * @return vector<Noeud> vector vide si la chaine est vide
  */
 vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vector<Arc> &listePredecesseur, vector<Arc> &listeSuccesseur){
+    cout << "Début de la recherche de la chaine améliorante!" << endl;
     vector<Noeud> file = vector<Noeud>();
     vector<Noeud> chaineAmeliorante = vector<Noeud>();
 
@@ -294,24 +308,24 @@ vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vect
         pgmImage.erase(pgmImage.begin());
 
         //On regarde ses successeurs
-        vector<Noeud>successeurs = x.getSuccesseurs();
-        for(Noeud successeur:successeurs){
+        vector<Noeud*>successeurs = x.getSuccesseurs();
+        for(Noeud* successeur:successeurs){
             //Si le successeur n'est pas marqué et son flot est inférieur à sa capacité maximum
-            if(successeur.isMarked()!=true && x.getArcWeight(successeur)<x.getMaxWeight(successeur)){
+            if(successeur->isMarked()!=true && x.getArcWeight(*successeur)<x.getMaxWeight(*successeur)){
                 //On ajoute le successeur à la file
-                successeur.setMarkedStatus(true);
-                pgmImage.insert(std::end(pgmImage), successeur);
+                successeur->setMarkedStatus(true);
+                pgmImage.insert(std::end(pgmImage), *successeur);
             }
         }
 
         //On regarde ses prédecesseurs
-        vector<Noeud> predecesseurs = x.getPredecesseurs();
-        for(Noeud predecesseur:predecesseurs){
+        vector<Noeud*> predecesseurs = x.getPredecesseurs();
+        for(Noeud* predecesseur:predecesseurs){
             //Si le prédecesseur n'est pas marqué et son flot est strictement positif
-            if(predecesseur.isMarked()!=true && predecesseur.getArcWeight(x)>0){
+            if(predecesseur->isMarked()!=true && predecesseur->getArcWeight(x)>0){
                 //On ajoute le prédecesseur à la file
-                predecesseur.setMarkedStatus(true);
-                pgmImage.insert(std::end(pgmImage), predecesseur);
+                predecesseur->setMarkedStatus(true);
+                pgmImage.insert(std::end(pgmImage), *predecesseur);
             }
         }
     } while (!file.empty() && pgmArray.back().isMarked() != true);
@@ -331,6 +345,7 @@ vector<Noeud> PGMImage::rechercheChaineAmeliorante(vector<Noeud> &pgmImage, vect
  * Algorithme de Ford-Fulkerson
  */
 vector<Noeud> PGMImage::fordFulkerson(){
+    cout << "Début de l'exécution du script ford-fulkerson" << endl;
     vector<Noeud> newPGMImage = pgmArray;
     vector<Arc> listeSuccesseur = vector<Arc>();
     vector<Arc> listePredecesseur = vector<Arc>();
@@ -354,12 +369,12 @@ vector<Noeud> PGMImage::fordFulkerson(){
         }
     } while (!chaineAmeliorante.empty());
     //Réinitialisation du marquage
-    for (int i = 0; i < newPGMImage.size();i++){
+    for (unsigned int i = 0; i < newPGMImage.size();i++){
         newPGMImage[i].setMarkedStatus(false);
     }
 
     //On réalise la binarisation de l'image en ignorant S et T
-    for (int i = 1; i < newPGMImage.size() - 1;i++){
+    for (unsigned int i = 1; i < newPGMImage.size() - 1;i++){
         binarisation(newPGMImage, newPGMImage[i], newPGMImage[0]);
         newPGMImage[0].setMarkedStatus(false);
         //On réinitialise le marquage du noeud en cours
@@ -384,13 +399,11 @@ vector<Noeud> PGMImage::fordFulkerson(){
  */
 int PGMImage::calculFlotResiduel(vector<Noeud> &chaineAmeliorante){
     int flotResiduel = 1024;
-    int node = 0;
     for (vector<Noeud>::size_type i = 0; i < chaineAmeliorante.size() - 1; i++)
     {
         int newCapacity = chaineAmeliorante[i].getArcWeight(chaineAmeliorante[i+1]);
         if (newCapacity < flotResiduel)
         {
-            node = i;
             flotResiduel = newCapacity;
         }
     }
@@ -399,9 +412,9 @@ int PGMImage::calculFlotResiduel(vector<Noeud> &chaineAmeliorante){
 
 void PGMImage::binarisation(vector<Noeud> pgmImage, Noeud& noeudActuel, Noeud& direction){
     noeudActuel.setMarkedStatus(true);
-    for (int i = 0; i < noeudActuel.getListeAdjascence().size();i++){
-        if(noeudActuel.getMaxWeight(noeudActuel.getListeAdjascence()[i]) == noeudActuel.getArcWeight(noeudActuel.getListeAdjascence()[i])){
-            binarisation(pgmImage, noeudActuel.getListeAdjascence()[i], direction);
+    for (unsigned int i = 0; i < noeudActuel.getListeAdjascence().size();i++){
+        if(noeudActuel.getMaxWeight(*(noeudActuel.getListeAdjascence()[i])) == noeudActuel.getArcWeight(*(noeudActuel.getListeAdjascence()[i]))){
+            binarisation(pgmImage, *(noeudActuel.getListeAdjascence()[i]), direction);
         }
     }
     //Arrivée à destination

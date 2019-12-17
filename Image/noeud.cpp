@@ -32,19 +32,19 @@ Noeud::Noeud(int x, int y, int value,int typeNoeud){
  */
 
 //Opération sur la liste d'adjascence
-void Noeud::ajouterUnNoeud(Noeud nouveauNoeud){
+void Noeud::ajouterUnNoeud(Noeud* nouveauNoeud){
     adjascences.insert(end(adjascences), nouveauNoeud);
 }
 
-void Noeud::supprimerUnNoeud(Noeud noeudASupprimer){
+void Noeud::supprimerUnNoeud(Noeud *noeudASupprimer){
     for (unsigned int ind = 0; ind < adjascences.size();ind++){
-        if(noeudASupprimer.i == adjascences[ind].i && noeudASupprimer.j == adjascences[ind].j){
+        if(noeudASupprimer->i == adjascences[ind]->i && noeudASupprimer->j == adjascences[ind]->j){
             adjascences.erase(adjascences.begin() + ind);
         }
     }
 }
 
-Noeud& Noeud::getElement(int i){
+Noeud* &Noeud::getElement(int i){
     return adjascences.at(i);
 }
 
@@ -117,7 +117,7 @@ void Noeud::setMarkedStatus(bool newMarkedStatus){
     exploredStatus = newMarkedStatus;
 }
 
-vector<Noeud> Noeud::getSuccesseurs(){
+vector<Noeud*> Noeud::getSuccesseurs(){
     return adjascences;
 }
 
@@ -125,9 +125,9 @@ bool Noeud::isMarked(){
     return exploredStatus;
 }
 
-vector<Noeud> Noeud::getPredecesseurs(){
+vector<Noeud*> Noeud::getPredecesseurs(){
     vector<Noeud> predecesseurs = vector<Noeud>();
-    return vector<Noeud>();
+    return vector<Noeud*>();
 }
 
 int Noeud::getX(){
@@ -138,6 +138,6 @@ int Noeud::getY(){
     return j;
 }
 
-vector<Noeud> Noeud::getListeAdjascence(){
+vector<Noeud*> Noeud::getListeAdjascence(){
     return adjascences;
 }

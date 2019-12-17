@@ -17,7 +17,7 @@ using namespace std;
             int j;
             int valeur;
             int typeNode;
-            vector<Noeud> adjascences;
+            vector<Noeud*> adjascences;
             bool exploredStatus;
 
         public:
@@ -29,12 +29,12 @@ using namespace std;
             ~Noeud();
 
             //Opération sur le vecteur
-            void ajouterUnNoeud(Noeud nouveauNoeud);
-            void supprimerUnNoeud(Noeud noeudASupprimer);
-            Noeud &getElement(int i);
+            void ajouterUnNoeud(Noeud *nouveauNoeud);
+            void supprimerUnNoeud(Noeud *noeudASupprimer);
+            Noeud* &getElement(int i);
 
             //Getter
-            vector<Noeud> getListeAdjascence();
+            vector<Noeud*> getListeAdjascence();
             int getValue();
             int getNodeType();
             bool isMarked();
@@ -48,8 +48,8 @@ using namespace std;
 
             //Autre
             int getMaxWeight(Noeud otherNoeud);
-            vector<Noeud> getSuccesseurs();
-            vector<Noeud> getPredecesseurs();
+            vector<Noeud*> getSuccesseurs();
+            vector<Noeud*> getPredecesseurs();
             int getFlowCapacity(Noeud adjascence);
 
             //operator==
